@@ -1,0 +1,58 @@
+theory bool
+imports Main
+begin
+(*conjunction*)
+fun conj1::"bool\<Rightarrow>bool\<Rightarrow>bool"
+  where "conj1 True True=True"|
+        "conj1 _ _ = False"
+lemma conj02: "conj1 False m = False"
+  apply(induction m)
+   apply(auto)
+  done
+
+definition conj2::"bool\<Rightarrow>bool\<Rightarrow>bool"
+  where"conj2 a b=(a \<and> b)"
+value "conj2 False True"
+value "conj2 True True"
+
+(*extract*)
+fun extract1::"bool\<Rightarrow>bool\<Rightarrow>bool"
+  where"extract1 False False=False"|
+       "extract1 _ _ =True"
+lemma extract01:"extract1 True m=True"
+  apply(induction m)
+   apply(auto)
+  done
+
+definition extract2::"bool\<Rightarrow>bool\<Rightarrow>bool"
+  where "extract2 a b=(a \<or> b)"
+value "extract2 False True"
+
+(*xor*)
+fun Xor::"bool\<Rightarrow>bool\<Rightarrow>bool"
+  where"Xor True True=False"|
+       "Xor False False=False"|
+       "Xor _ _=True"
+lemma Xor1:"Xor False m =m"
+  apply(induction m)
+   apply(auto)
+  done
+definition XOR :: "bool \<Rightarrow> bool \<Rightarrow> bool"
+  where "XOR a b \<equiv> (a \<and> \<not>b) \<or> (\<not>a \<and> b)"
+
+value "XOR True False"
+lemma "XOR True True = False"
+  by(simp add:XOR_def)
+
+(*same*)
+fun same1::"bool\<Rightarrow>bool\<Rightarrow>bool"
+  where"same1 True True =True"|
+       "same1 False False=True"|
+       "same1 _ _=False"
+lemma same01:"same1 False True=False" by simp
+
+definition same2 ::"bool\<Rightarrow>bool\<Rightarrow>bool"
+  where"same2 a b=(if a=b then True else False)"
+value "same2 True False"
+value "same2 True True"
+end

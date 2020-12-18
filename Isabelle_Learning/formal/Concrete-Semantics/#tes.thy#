@@ -1,0 +1,9 @@
+theory tes
+imports Main
+begin
+fun sum_even::"nat\<Rightarrow>nat"
+  where
+"sum_even 0=0"|
+"sum_even n=n+(sum_even(n-2))"
+value "sum_even 16
+end

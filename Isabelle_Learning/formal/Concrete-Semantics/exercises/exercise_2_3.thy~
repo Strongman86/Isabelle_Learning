@@ -1,0 +1,5 @@
+theory exercise_2_3
+  imports Main
+begin
+
+end

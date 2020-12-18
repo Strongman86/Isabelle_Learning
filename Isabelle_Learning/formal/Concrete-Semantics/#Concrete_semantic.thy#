@@ -1,0 +1,217 @@
+theory Concrete_semantic
+imports Main
+begin
+(*2.2.1 P7*)
+datatype bool=True|False
+fun conj::"bool\<Rightarrow>bool\<Rightarrow>bool"
+  where
+"conj True True=True"|
+"conj _ _=False"
+
+(*------------------*)
+(*2.2.2 P8*)
+fun add::"nat\<Rightarrow>nat\<Rightarrow>nat"
+where
+"add 0 n =n"|
+"add(Suc m) n=Suc(add m n)"
+lemma add_02:"add m 0=m"
+apply(induction m)
+apply(auto)
+  done
+(*------------------*)
+
+
+(*2.2.3 P10,11*)
+datatype 'a list = Nil | Cons 'a "'a list"
+fun app::"'a list\<Rightarrow>'a list \<Rightarrow>'a list"
+where
+"app Nil ys = ys" |
+"app(Cons x xs) ys=Cons x(app xs ys)"
+
+fun rev::" 'a list\<Rightarrow>'a list"
+where
+"rev Nil = Nil " |
+"rev(Cons x xs)=app(rev xs)(Cons x Nil)"
+value "rev(Cons True (Cons False Nil))"
+value "rev(Cons a (Cons b Nil))"
+lemma app_Nil2 [simp]:"app xs Nil = xs" 
+  apply(induction xs) 
+  apply(auto) 
+  done
+lemma app_assoc [simp]: "app (app xs ys) zs = app xs (app ys zs)" 
+  apply(induction xs) 
+  apply(auto) 
+  done
+lemma rev_app [simp]:"rev(app xs ys) = app(rev ys)(rev xs)"
+apply (induction xs)
+   apply(auto)
+  done
+lemma rev_rev [simp]: "rev (rev xs) =xs"
+  apply (induction xs)
+   apply(auto)
+  done
+(*-------------------*)
+
+(*2.2.5 P14*)
+fun map::"('a\<Rightarrow>'b) \<Rightarrow> 'a list \<Rightarrow>'b list"
+  where
+"map f Nil=Nil"|
+"map f (Cons x xs) = Cons (f x) (map f xs)"
+
+primrec(nonexhaustive) hd::"'a list\<Rightarrow> 'a" where
+"hd (x # xs) = x"
+
+
+
+fun tl::"'a list\<Rightarrow>'a list"
+  where
+"tl [] = []"|
+"tl (x#xs) =xs"
+(*-------------------*)
+
+
+(*2.3.1 P16*)
+(*e1*)
+datatype 'a tree=Tip | Node "'a tree" 'a "'a tree"
+fun mirror::"'a tree\<Rightarrow>'a tree"
+  where
+"mirror Tip=Tip"|
+"mirror(Node l a r) = Node (mirror r) a (mirror l)"
+lemma "mirror(mirror t) =t"
+  apply(induction t)
+   apply(auto)
+  done
+(*e2*)
+datatype 'a option=None | Some 'a
+fun lookup::"('a *'b)list \<Rightarrow> 'a \<Rightarrow> 'b option"
+  where
+"lookup [] x= None"|
+"lookup ((a,b)#ps)x= (if a=x then Some b else lookup ps x)"
+
+
+(*-------------------*)
+
+(*2.3.2 P17*)
+definition sq::"nat\<Rightarrow>nat"where
+"sq n=n*n"
+(*-------------------*)
+
+(*2.3.3 P17*)
+abbreviation sq' :: "nat\<Rightarrow>nat" where(*? ? ?*)
+"sq' n=n*n"
+(*------------------*)
+
+
+(*2.3.4*)
+fun div2::"nat\<Rightarrow>nat"where
+"div2 0= 0"|
+"div2 (Suc 0) = 0"|
+"div2 (Suc (Suc n)) =Suc(div2 n)"
+lemma "div2(n) = n div 2"
+  apply(induction n rule:div2.induct)
+  apply(auto)
+  done
+(*-------------------*)
+
+(*2.4 P20*)
+fun itrev::"'a list \<Rightarrow> 'a list \<Rightarrow> 'a list"
+  where
+"itrev []      ys = ys" |
+"itrev (x#xs) ys = itrev xs (x#ys)"
+lemma "itrev xs [] = rev xs"
+  apply(induction xs)
+  apply(auto)
+lemma "itrev xs ys=rev xs @ ys"
+  apply(induction xs arbitrary: ys)
+  apply(auto)
+  done
+(*---------------*)
+
+(*3.1.2 P28*)
+type_synonym vname=string
+datatype aexp=N int | V vname | Plud aexp aexp
+type_synonym val=int
+type_synonym state = vname\<Rightarrow>val(*? ? ?*)
+fun aval::"aexp \<Rightarrow> state \<Rightarrow> val"
+  where
+"aval (N n) s =n"|
+"aval (V x) s=s x"|
+"aval (Plus a b)s=aval a s +aval b s"
+
+value "aval (Plus (N 3)(V ''x'')) (\<lambda>x.0)" 
+(*3.1.3 P29 *)
+fun asimp_const::"aexp\<Rightarrow>aexp"
+  where
+"asimp_const (N n) =n"|
+"asimp_const (V x) =x"|
+"asimp_const (Plus a b) =(case(asimp_const a,asimp_const b)of (N x,N y) \<Rightarrow>(N x+y)|(n,m) \<Rightarrow>Plus n m)"
+  apply(induction a)
+  apply(auto split:aexp.split)
+  done
+
+fun plus::"aexp\<Rightarrow>aexp\<Rightarrow>aexp"
+  where
+"plus (N a) (N b) =N(a +b )"|
+"plus (N i) a=(if i=0 then a else Plus(N i)a)"|
+"plus a (N i) = (if i=0 then a else Plus a (N i))"|
+"plus x y=Plus x y"
+lemma aval plus:"aval(plus a b)s=aval a s +aval b s"
+fun asimp::"aexp\<Rightarrow>aexp"where
+"asimp (N n) =N n"|
+"asimp (V x) =V x"|
+"asimp (Plus a b) = plus (asimp a)(asimp b)"
+
+lemma "aval(asimp a)s=aval a s"
+(*3.2 P32*)
+datatype bexp=Bc bool|Not bexp|And bexp bexp|Less aexp aexp
+fun bval::"bexp\<Rightarrow>state\<Rightarrow>bool"
+  where
+"bval (Bc v)s=v"|
+"bval (Not b)s=(\<not>bval b s)"|
+"bval (And a b)s=(bval a s\<And>bval b s)"|
+"bval (Less x y)s=(aval x s <aval b s)"
+(*3.2.1 P33*)
+fun not::"bexp\<Rightarrow>bexp"where
+"not (Bc True) = Bc False"|
+"not (Bc False) =Bc True"|
+"not b=Not b"
+
+fun "and"::"bexp\<Rightarrow>bexp\<Rightarrow>bexp"
+  where
+"and (Bc True) b=b"|
+"and b (Bc True) =b"|
+"and  (Bc False)b =False"|
+"and b(Bc False) =False"|
+"and a b=And a b"
+
+fun less::"aexp\<Rightarrow>aexp\<Rightarrow>bexp"
+  where
+"less (N a)(N b) =Bc( a<b)"|
+"less x y=Less x y"
+fun bsimp::"bexp\<Rightarrow>bexp"where
+"bsimp(Bc v) =Bc v"|
+"bsimp(Not b) =not(bsimp b)"|
+"bsimp (And a b) =and(bsimp a) (bsimp b)"|
+"bsimp (Less x y) =less (asimp x) (asimp y)"
+(*3.3 35*)
+datatype instr=LOADI val|LOAD vname|ADD
+type_synonym stack="val list"
+fun exec1::"instr\<Rightarrow>state\<Rightarrow>stack\<Rightarrow>stack"
+  where
+"exec1 (LOADI n) - stk=n#stk"|
+"exec1 (LOAD x) s stk=s(x)#stk"|
+"exec1 ADD _ (i#j#stk)=(i+j)#stk"
+fun exec::"instr list\<Rightarrow>state\<Rightarrow>stack\<Rightarrow>stack"
+  where
+"exec [] stk=stk"|
+"exec (i#is) s stk=exec is s (exec1 i s stk)"
+lemma "exec (comp a) s stk=aval a s # stk"
+
+lemma "\<not>surj(f:: 'a\<Rightarrow> 'a set)"
+proof
+  assume 0:"surj f"
+  from 0 have 1:"\<forall>A.\<exists>a.A=f a"by(simp add:surj_def)
+  from 1 have 2:"\<exists>a.{x.x\<notin>f x}=f a"by blast
+  from 2 show "False" by blast
+qed
+

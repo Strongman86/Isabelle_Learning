@@ -1,0 +1,12 @@
+theory tree
+  imports Main
+begin
+datatype  'a tree=None | Node "'a tree" 'a "'a tree"
+fun mirror::"'a tree\<Rightarrow>'a tree "
+  where "mirror None=None"|
+        "mirror (Node left n right) =Node (mirror right) n (mirror left)"
+lemma mirror01:"mirror(mirror r) =r"
+  apply(induction r)
+  apply(auto)
+  done
+end

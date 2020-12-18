@@ -1,0 +1,42 @@
+theory exercise_2_1
+  imports Main
+begin
+(*set add function*)
+fun add::"nat\<Rightarrow>nat\<Rightarrow>nat"
+  where
+"add m 0  =m"|
+"add m  (Suc n)=Suc(add m n)"
+
+(*set association*)
+theorem add_assoc:"add x (add y z) =add (add x y) z"
+  apply(induction z)
+  apply(auto)
+  done
+(*set add 0 x*)
+lemma add_zero:"add 0 x=x"
+  apply(induction x)
+  apply(auto)
+  done
+
+lemma suc_add:"Suc(add y x) = add (Suc y)  x"
+  apply(induction x)
+  apply(auto)
+  done
+theorem add_com:"add x y=add y x"
+  apply(induction y)(*the different with using x or y as value ? ?*)
+  apply(auto)
+  apply(simp add:add_zero)
+  apply(simp add:suc_add)
+  done
+
+(*fun double*)
+fun double::"nat\<Rightarrow>nat" 
+  where
+"double 0=0"|
+"double (Suc m) =2+(double m)"(*Why here is add ,not mutl? ?*)
+theorem double_add:"double m=add m m"
+  apply(induction m)
+   apply(auto)
+  apply(simp add:add_com)
+  done
+end

@@ -1,0 +1,15 @@
+"prettifySymbolsMode.substitutions": [
+    {
+      "language": "isabelle",
+      "revealOn": "none",
+      "adjustCursorMovement": true,
+      "prettyCursor": "none",
+      "substitutions": []
+    },
+    {
+      "language": "isabelle-ml",
+      "revealOn": "none",
+      "adjustCursorMovement": true,
+      "prettyCursor": "none",
+      "substitutions": []
+    }]

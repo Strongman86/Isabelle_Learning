@@ -1,0 +1,12 @@
+theory int
+imports Main
+begin
+fun add1::"nat \<Rightarrow>nat \<Rightarrow>nat"
+  where"add1 0 n=n"|
+       "add1 (Suc m) n=Suc(add1 m n)"
+value "add1 1 3"
+lemma add01:"add1 m n =m+n"
+  apply(induction m)
+   apply(auto)
+  done
+end

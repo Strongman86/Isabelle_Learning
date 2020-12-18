@@ -1,0 +1,23 @@
+theory exercise_2_4
+imports Main
+ begin
+fun snoc::"'a list\<Rightarrow>'a\<Rightarrow>'a list"
+  where
+"snoc [] x=[x]"|
+"snoc (y#ys) x= y#(snoc ys x)"(*connect the new element and list*)
+
+fun reverse::"'a list\<Rightarrow>'a list"
+  where
+"reverse [] =[]"|
+"reverse (x#xs) = snoc(reverse xs) x"(*reverse the list*)
+
+lemma reverse_02[simp]:"reverse (snoc xs x) =x#(reverse xs)"
+  apply(induction xs)
+   apply(auto)
+  done
+
+lemma reverse_arr:"reverse(reverse xs) =xs"
+  apply(induction xs)
+   apply(auto)
+  done
+end

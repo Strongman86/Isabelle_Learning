@@ -1,0 +1,16 @@
+theory induction
+imports Main
+begin 
+lemma rev01:"rev(rev r) = r"
+  apply(induction r)
+   apply(auto)
+  done
+
+lemma rev02:"rev (rev (rev (rev r))) =r"
+  apply(induction r)
+   apply(auto)
+  done
+
+lemma equal01:"\<lbrakk>xs @ ys=ys @ xs; length xs=length ys\<rbrakk> \<Longrightarrow> xs=ys"
+  using append_eq_append_conv by blast
+end
